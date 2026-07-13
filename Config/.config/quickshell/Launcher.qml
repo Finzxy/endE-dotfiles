@@ -11,6 +11,8 @@ PanelWindow {
     property string query: ""
     property int popupSize: 360
 
+    readonly property string queryLower: query.toLowerCase()
+
     screen: anchorWindow ? anchorWindow.screen : null
     anchors { top: true; bottom: true; left: true; right: true }
     exclusionMode: ExclusionMode.Ignore
@@ -29,7 +31,9 @@ PanelWindow {
         onTriggered: searchField.forceActiveFocus()
     }
     Keys.onPressed: (event) => {
-        if (!searchField.activeFocus && event.text && event.text.length > 0 && !event.modifiers) {
+        // Shift must stay allowed (capitals, symbols) - only real shortcuts get excluded
+        const isShortcut = event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier)
+        if (!searchField.activeFocus && event.text && event.text.length > 0 && !isShortcut) {
             searchField.forceActiveFocus()
             searchField.text += event.text
             event.accepted = true
@@ -108,13 +112,16 @@ PanelWindow {
                         model: DesktopEntries.applications.values
                         Rectangle {
                             required property var modelData
+                            // computed once per app instead of on every keystroke
+                            readonly property string searchText: (modelData.name || "").toLowerCase() + " " + (modelData.comment || "").toLowerCase() + " " + (modelData.genericName || "").toLowerCase()
+                            readonly property bool isSystemEntry: modelData.noDisplay
                             width: appColumn.width
                             height: 54
                             radius: 6
                             color: "#333333"
                             border.color: "#4f4f4f"
                             border.width: 1
-                            visible: ((launcher.filterMode === "all") || (launcher.filterMode === "system" && (modelData.noDisplay || modelData.hidden))) && (!launcher.query || (modelData.name || "").toLowerCase().indexOf(launcher.query.toLowerCase()) !== -1 || (modelData.comment || "").toLowerCase().indexOf(launcher.query.toLowerCase()) !== -1 || (modelData.genericName || "").toLowerCase().indexOf(launcher.query.toLowerCase()) !== -1)
+                            visible: (launcher.filterMode === "system" || !isSystemEntry) && (!launcher.query || searchText.indexOf(launcher.queryLower) !== -1)
                             Row {
                                 anchors.fill: parent
                                 anchors.margins: 8
@@ -128,12 +135,16 @@ PanelWindow {
                                     border.width: 1
                                     anchors.verticalCenter: parent.verticalCenter
                                     Image {
+                                        id: appIcon
                                         anchors.fill: parent
                                         anchors.margins: 4
-                                        source: modelData.icon ? ("image://icon/" + modelData.icon) : (modelData.iconName ? ("image://icon/" + modelData.iconName) : "")
+                                        source: modelData.icon ? Quickshell.iconPath(modelData.icon, true) : ""
                                         fillMode: Image.PreserveAspectFit
                                         smooth: true
-                                        visible: source !== "" && status === Image.Ready
+                                        cache: true
+                                        sourceSize.width: 64
+                                        sourceSize.height: 64
+                                        visible: status === Image.Ready
                                     }
                                     Text {
                                         anchors.centerIn: parent
@@ -142,7 +153,7 @@ PanelWindow {
                                         font.pixelSize: 14
                                         font.bold: true
                                         font.family: "monospace"
-                                        visible: source === ""
+                                        visible: !appIcon.visible
                                     }
                                 }
                                 Column {
@@ -153,7 +164,7 @@ PanelWindow {
                                     Text { width: parent.width; text: modelData.comment || modelData.genericName || ""; color: "#bdbdbd"; font.pixelSize: 9; elide: Text.ElideRight }
                                 }
                             }
-                            MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: { launcher.open = false; modelData.execute(); } }
+                            MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: { launcher.requestClose(); modelData.execute(); } }
                         }
                     }
                 }

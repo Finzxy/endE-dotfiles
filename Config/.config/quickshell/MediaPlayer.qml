@@ -5,7 +5,9 @@ import Quickshell.Services.Mpris
 Item {
     id: media
     implicitWidth: 260
-    implicitHeight: 84
+    implicitHeight: 92
+    width: implicitWidth
+    height: implicitHeight
 
     property var activePlayer: {
         var list = Mpris.players.values
@@ -19,18 +21,28 @@ Item {
     property string cachedArtUrl: ""
 
     function loadThumbnail() {
-        if (!media.activePlayer) return
+        if (!media.activePlayer) {
+            media.cachedArtUrl = ""
+            return
+        }
         if (media.activePlayer.trackArtUrl) {
             media.cachedArtUrl = media.activePlayer.trackArtUrl
         } else if (media.activePlayer.metadata && media.activePlayer.metadata["mpris:artUrl"]) {
             media.cachedArtUrl = media.activePlayer.metadata["mpris:artUrl"]
+        } else {
+            media.cachedArtUrl = ""
         }
     }
+
+    // activePlayer switching (or disappearing) didn't used to refresh the art,
+    // so the old thumbnail stuck around after pausing/closing a player
+    onActivePlayerChanged: loadThumbnail()
+    Component.onCompleted: loadThumbnail()
 
     Rectangle {
         id: content
         width: parent.width
-        height: 92
+        height: parent.height
         color: "#333333"
         radius: 8
         border.color: "#4f4f4f"
@@ -51,6 +63,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
 
                 Image {
+                    id: artImage
                     anchors.fill: parent
                     anchors.margins: 1
                     source: media.cachedArtUrl
@@ -60,14 +73,14 @@ Item {
                     cache: true
                     sourceSize.width: 112
                     sourceSize.height: 112
+                    visible: status === Image.Ready
                 }
 
                 Connections {
                     target: media.activePlayer
-                    function refresh() { media.loadThumbnail() }
-                    function onTrackArtUrlChanged() { refresh() }
-                    function onMetadataChanged() { refresh() }
-                    function onPlaybackStateChanged() { refresh() }
+                    function onTrackArtUrlChanged() { media.loadThumbnail() }
+                    function onMetadataChanged() { media.loadThumbnail() }
+                    function onPlaybackStateChanged() { media.loadThumbnail() }
                 }
 
                 Text {
@@ -75,12 +88,12 @@ Item {
                     text: "♫"
                     color: "#bdbdbd"
                     font.pixelSize: 14
-                    visible: media.cachedArtUrl === ""
+                    visible: !artImage.visible
                 }
             }
 
             Column {
-                width: Math.max(0, parent.width - 56 - 8)
+                width: Math.max(0, parent.width - 62 - 8)
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 8
 
@@ -124,6 +137,7 @@ Item {
                         MouseArea {
                             id: mousePrev
                             anchors.fill: parent
+                            anchors.margins: -3
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             enabled: media.activePlayer && media.activePlayer.canGoPrevious
@@ -135,7 +149,7 @@ Item {
                         width: 28
                         height: 28
                         radius: 8
-                        color: mousePlay.containsPress ? "#eef8ff" : mousePlay.containsMouse ? "#ffffff" : "#353535"
+                        color: mousePlay.containsPress ? "#ffffff" : mousePlay.containsMouse ? "#ffffff" : "#353535"
                         opacity: (media.activePlayer && media.activePlayer.canTogglePlaying) ? 1 : 0.45
                         Text {
                             anchors.centerIn: parent
@@ -146,6 +160,7 @@ Item {
                         MouseArea {
                             id: mousePlay
                             anchors.fill: parent
+                            anchors.margins: -3
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             enabled: media.activePlayer && media.activePlayer.canTogglePlaying
@@ -162,7 +177,7 @@ Item {
                         height: 28
                         radius: 8
                         color: mouseNext.containsPress ? "#ffffff" : mouseNext.containsMouse ? "#ffffff" : "#353535"
-                        opacity: (media.activePlayer && media.activePlayer.canGoNext) ? 1 : 0.450
+                        opacity: (media.activePlayer && media.activePlayer.canGoNext) ? 1 : 0.45
                         Text {
                             anchors.centerIn: parent
                             text: "⏭"
@@ -172,6 +187,7 @@ Item {
                         MouseArea {
                             id: mouseNext
                             anchors.fill: parent
+                            anchors.margins: -3
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             enabled: media.activePlayer && media.activePlayer.canGoNext
@@ -183,4 +199,3 @@ Item {
         }
     }
 }
-

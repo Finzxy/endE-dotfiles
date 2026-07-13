@@ -2,16 +2,14 @@ import Quickshell
 import QtQuick
 
 Scope {
-    id: root
-
-    property bool launcherOpen: false
-    property bool calendarOpen: false
-
     Variants {
         model: Quickshell.screens
         PanelWindow {
             id: bar
             required property var modelData
+            property bool launcherOpen: false
+            property bool calendarOpen: false
+
             screen: modelData
             anchors { top: true; left: true; right: true }
             implicitHeight: 34
@@ -27,7 +25,7 @@ Scope {
                 anchors.verticalCenter: parent.verticalCenter
                 Text {
                     anchors.centerIn: parent
-                    text: ""
+                    text: ""
                     color: "#ffffff"
                     font.pixelSize: 16
                     font.bold: true
@@ -35,10 +33,11 @@ Scope {
                 }
                 MouseArea {
                     anchors.fill: parent
+                    anchors.margins: -6
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        root.calendarOpen = false
-                        root.launcherOpen = !root.launcherOpen
+                        bar.calendarOpen = false
+                        bar.launcherOpen = !bar.launcherOpen
                     }
                 }
             }
@@ -60,26 +59,26 @@ Scope {
                 }
                 MouseArea {
                     anchors.fill: parent
+                    anchors.margins: -4
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        root.launcherOpen = false
-                        root.calendarOpen = !root.calendarOpen
+                        bar.launcherOpen = false
+                        bar.calendarOpen = !bar.calendarOpen
                     }
                 }
             }
 
             Launcher {
                 anchorWindow: bar
-                open: root.launcherOpen
-                onRequestClose: root.launcherOpen = false
+                open: bar.launcherOpen
+                onRequestClose: bar.launcherOpen = false
             }
 
             Calendar {
                 anchorWindow: bar
-                open: root.calendarOpen
+                open: bar.calendarOpen
             }
 
         }
     }
 }
-
