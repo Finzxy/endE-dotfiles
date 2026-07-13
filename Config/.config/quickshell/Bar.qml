@@ -25,7 +25,7 @@ Scope {
                 anchors.verticalCenter: parent.verticalCenter
                 Text {
                     anchors.centerIn: parent
-                    text: ""
+                    text: "󰣇"
                     color: "#ffffff"
                     font.pixelSize: 16
                     font.bold: true
