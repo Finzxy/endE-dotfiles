@@ -11,3 +11,6 @@ mv ~/endE-dotfiles/Config/.config/quickshell ~/.config/
 mv ~/endE-dotfiles/Config/.config/hypr ~/.config/
 mv ~/endE-dotfiles/Config/.config/matugen ~/.config/
 ```
+
+## Preview
+<img src=".github/Screenshot from 2026-07-18 00-20-33.webp">
