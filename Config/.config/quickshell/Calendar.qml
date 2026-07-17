@@ -12,7 +12,7 @@ PopupWindow {
     grabFocus: true
 
     implicitWidth: 260
-    implicitHeight: 300
+    implicitHeight: bg.height
     visible: open
     color: "transparent"
 
@@ -21,10 +21,11 @@ PopupWindow {
     onOpenChanged: if (open) calGrid.now = new Date()
 
     Rectangle {
+        id: bg
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        height: parent.height
+        height: mainColumn.implicitHeight + mainColumn.anchors.margins * 2
         opacity: calendar.open ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: 320; easing.type: Easing.OutCubic } }
         color: "#424242"
@@ -33,6 +34,7 @@ PopupWindow {
         radius: 12
 
         Column {
+            id: mainColumn
             anchors.fill: parent
             anchors.margins: 12
             spacing: 10
@@ -98,17 +100,6 @@ PopupWindow {
                         }
                     }
                 }
-            }
-
-            Rectangle {
-                width: parent.width
-                height: 1
-                color: "#505050"
-            }
-
-            MediaPlayer {
-                width: parent.width
-                anchors.horizontalCenter: parent.horizontalCenter
             }
         }
     }

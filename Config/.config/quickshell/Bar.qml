@@ -48,6 +48,13 @@ Scope {
                 height: timeText.implicitHeight + 16
                 radius: 8
                 color: "transparent"
+                
+                Timer {
+                    id: calendarTimer
+                    interval: 150
+                    onTriggered: bar.calendarOpen = false
+                }
+
                 Text {
                     id: timeText
                     anchors.centerIn: parent
@@ -57,13 +64,19 @@ Scope {
                     font.bold: true
                     font.family: "monospace"
                 }
+                
                 MouseArea {
                     anchors.fill: parent
                     anchors.margins: -4
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor // Kursor berubah menjadi tangan di sini
+                    onEntered: {
+                        calendarTimer.stop()
                         bar.launcherOpen = false
-                        bar.calendarOpen = !bar.calendarOpen
+                        bar.calendarOpen = true
+                    }
+                    onExited: {
+                        calendarTimer.start()
                     }
                 }
             }
