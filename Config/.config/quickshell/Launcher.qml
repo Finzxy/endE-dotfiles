@@ -12,6 +12,11 @@ PanelWindow {
     property int popupSize: 360
 
     readonly property string queryLower: query.toLowerCase()
+    readonly property var sortedApps: {
+        let apps = DesktopEntries.applications.values.slice()
+        apps.sort((a, b) => (a.name || "").localeCompare(b.name || ""))
+        return apps
+    }
 
     screen: anchorWindow ? anchorWindow.screen : null
     anchors { top: true; bottom: true; left: true; right: true }
@@ -72,8 +77,8 @@ PanelWindow {
             } 
         }
         
-        color: "#242424" // Warna background yang lebih elegan
-        border.color: "#3a3a3a"
+        color: "#11111b" // Warna background yang lebih elegan
+        border.color: "#1e1e2e"
         border.width: 1
         radius: 0
         topLeftRadius: 12
@@ -91,8 +96,8 @@ PanelWindow {
                 width: parent.width
                 height: 36 // Sedikit lebih tinggi agar lebih nyaman diklik
                 radius: 8
-                color: "#1e1e1e"
-                border.color: "#3a3a3a"
+                color: "#1e1e2e"
+                border.color: "#2a2a3a"
                 border.width: 1
                 
                 TextField {
@@ -134,7 +139,7 @@ PanelWindow {
                     spacing: 4
                     
                     Repeater {
-                        model: DesktopEntries.applications.values
+                        model: launcher.sortedApps
                         Rectangle {
                             required property var modelData
                             
@@ -148,7 +153,7 @@ PanelWindow {
                             visible: (launcher.filterMode === "system" || !isSystemEntry) && matchesSearch
                             
                             // UI lebih rapi tanpa border, murni mengandalkan highlight warna saat di-hover
-                            color: appMouseArea.containsMouse ? "#333333" : "transparent"
+                            color: appMouseArea.containsMouse ? "#1e1e2e" : "transparent"
                             
                             Behavior on color { ColorAnimation { duration: 100 } }
 
@@ -178,7 +183,7 @@ PanelWindow {
                                     Rectangle {
                                         anchors.fill: parent
                                         radius: 8
-                                        color: "#383838"
+                                        color: "#6c7086"
                                         visible: !appIcon.visible
                                         Text {
                                             anchors.centerIn: parent
@@ -199,7 +204,7 @@ PanelWindow {
                                     Text { 
                                         width: parent.width 
                                         text: modelData.name 
-                                        color: "#eeeeee" 
+                                        color: "#ffffff" 
                                         font.pixelSize: 12 // Sedikit lebih besar & menggunakan font sistem yang lebih rapi
                                         font.bold: true 
                                         elide: Text.ElideRight 

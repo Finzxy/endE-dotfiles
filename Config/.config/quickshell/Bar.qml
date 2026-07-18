@@ -13,7 +13,7 @@ Scope {
             screen: modelData
             anchors { top: true; left: true; right: true }
             implicitHeight: 34
-            color: "#303030"
+            color: "#11111b"
 
             Rectangle {
                 width: 28

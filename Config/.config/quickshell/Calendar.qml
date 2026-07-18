@@ -28,8 +28,8 @@ PopupWindow {
         height: mainColumn.implicitHeight + mainColumn.anchors.margins * 2
         opacity: calendar.open ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: 320; easing.type: Easing.OutCubic } }
-        color: "#424242"
-        border.color: "#505050"
+        color: "#11111b"
+        border.color: "#1e1e2e"
         border.width: 1
         radius: 12
 
@@ -58,7 +58,7 @@ PopupWindow {
                         width: 28
                         horizontalAlignment: Text.AlignHCenter
                         text: modelData
-                        color: "#bdbdbd"
+                        color: "#ffffff"
                         font.pixelSize: 10
                         font.family: "monospace"
                     }
@@ -93,7 +93,7 @@ PopupWindow {
                         Text {
                             anchors.centerIn: parent
                             text: isDay ? dayNum : ""
-                            color: isToday ? "#424242" : "#ffffff"
+                            color: isToday ? "#11111b" : "#ffffff"
                             font.pixelSize: 11
                             font.family: "monospace"
                             font.bold: isToday
